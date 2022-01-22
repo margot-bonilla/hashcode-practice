@@ -10,7 +10,7 @@ from algo import *
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     car_score = 1000
-    max_time_simulation = 6
+    max_time_simulation = 6 + 1
     
     nodos = [node(i) for i in range(4)]
     edges = []
@@ -21,9 +21,11 @@ if __name__ == '__main__':
     edges.append(Edge(3, nodos[1], nodos[2], 4))
 
     car_routes_id = [[0, 1, 4, 3], [2, 4, 0]]
-    
+
+
+    #print("El score ha sido de:")
+    final_score = GA(max_time_simulation, car_routes_id, nodos, edges, car_score, len_population = 100, iter = 20, verbose = True)
     print()
-    print("El score ha sido de:")
-    print(GA(max_time_simulation, car_routes_id, nodos, edges, car_score, len_population = 100, iter = 20))
+    print("The final_score is: " + str(final_score))
 
 

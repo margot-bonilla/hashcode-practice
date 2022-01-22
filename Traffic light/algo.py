@@ -3,9 +3,10 @@ from car import *
 import copy
 from edge import *
 
-def GA(max_time_simulation, car_routes_id, nodos, edges, car_score, len_population = 200, iter = 100, best = 4, alpha_mutation = 0.4):
+def GA(max_time_simulation, car_routes_id, nodos, edges, car_score, len_population = 200, iter = 100, best = 4, alpha_mutation = 0.4, verbose = False):
 
     population = initial_population(len_population, max_time_simulation, edges, nodos)
+    first = True
     for _ in range(iter):
         for k in population:
             ind = k
@@ -16,12 +17,20 @@ def GA(max_time_simulation, car_routes_id, nodos, edges, car_score, len_populati
                 i.route[0].cost = 0
 
             for i in range(max_time_simulation):
+                if verbose:
+                    print()
+                    print("Simulation time: " + str(i))
+
                 car_aux = create_new_cars(car_aux, aux_edges[i])
                 for j in car_aux:
                     if len(j.route) > 0:
-                        j.traffic_light(j.route[0].on, i+1)
+                        j.traffic_light(j.route[0].on, i, verbose)
                     else:
-                        ind[-1] += j.destroy(i+1, max_time_simulation, car_score)
+                        ind[-1] += j.destroy(i, max_time_simulation, car_score, verbose)
+
+            if verbose == True and first:
+                first = False
+                verbose = False
 
         population_sorted = sorted(population, key=lambda population: population[-1], reverse=True)
         population = cross_over(population_sorted, len(population_sorted)-best)
