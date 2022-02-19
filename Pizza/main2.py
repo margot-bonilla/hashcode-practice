@@ -131,13 +131,13 @@ def main(in_file, process_count, out_file):
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    main('input_data/e_elaborate.in.txt', 1, 'output_data/e_elaborate.out.txt')
-    # if len(sys.argv) < 2:
-    #     print(sys.argv[0] + ' [in file] [out file: optional]')
-    # elif len(sys.argv) == 2:
-    #     main(sys.argv[1], 1, None)
-    # elif len(sys.argv) == 3:
-    #     main(sys.argv[1], int(sys.argv[2]), None)
-    # else:
-    #     main(sys.argv[1], int(sys.argv[2]), sys.argv[3])
+    # main('input_data/e_elaborate.in.txt', 1, 'output_data/e_elaborate.out.txt')
+    if len(sys.argv) < 2:
+        print(sys.argv[0] + ' [in file] [out file: optional]')
+    elif len(sys.argv) == 2:
+        main(sys.argv[1], 1, None)
+    elif len(sys.argv) == 3:
+        main(sys.argv[1], int(sys.argv[2]), None)
+    else:
+        main(sys.argv[1], int(sys.argv[2]), sys.argv[3])
 
