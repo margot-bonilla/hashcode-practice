@@ -108,7 +108,7 @@ def algo(Clients, productos, q, seed):
     return q.put((best_pizza, best_points))
 
 
-def main(in_file, out_file, process_count):
+def main(in_file, process_count, out_file):
     q = Queue()
     """
     The main program reads the input file, processes the calculation
@@ -152,9 +152,9 @@ if __name__ == '__main__':
     if len(sys.argv) < 2:
         print(sys.argv[0] + ' [in file] [out file: optional]')
     elif len(sys.argv) == 2:
-        main(sys.argv[1], None, 1)
+        main(sys.argv[1], 1, None)
     elif len(sys.argv) == 3:
-        main(sys.argv[1], None, int(sys.argv[2]))
+        main(sys.argv[1], int(sys.argv[2]), None)
     else:
-        main(sys.argv[1], sys.argv[3], int(sys.argv[2]))
+        main(sys.argv[1], int(sys.argv[2]), sys.argv[3])
 
