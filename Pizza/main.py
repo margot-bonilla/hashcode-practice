@@ -1,6 +1,7 @@
 import sys
 import random as rand
 import copy
+from multiprocessing import Process, Queue
 
 # Press Mayús+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
@@ -88,7 +89,7 @@ def inicializar_lista(Clients, productos):
     return dic
 
 
-def algo(Clients, productos):
+def algo(Clients, productos, q, seed):
     dic = inicializar_lista(Clients, productos)
 
     best_pizza = []
@@ -104,10 +105,11 @@ def algo(Clients, productos):
                 best_pizza = copy.deepcopy(pizza)
                 best_points = points
 
-    return (best_pizza, best_points)
+    return q.put((best_pizza, best_points))
 
 
-def main(in_file, out_file):
+def main(in_file, out_file, process_count):
+    q = Queue()
     """
     The main program reads the input file, processes the calculation
     and writes the output file
@@ -120,7 +122,20 @@ def main(in_file, out_file):
     # Read File
     clients, products = read_file(in_file)
     # Process Algorithm
-    final_result, final_score = algo(clients, products)
+    processes = []
+    for i in range(process_count):
+        p = Process(target=algo, args=(clients, products, q, i,))
+        processes.append(p)
+        p.start()
+
+    for p in processes:
+        p.join()
+
+    results = []
+    while not q.empty():
+        results.append(q.get())
+    sorted_results = sorted(results, key=lambda tup: tup[1], reverse=True)
+    final_result, final_score = sorted_results[0]
     # Print Score
     print(f'Result: {final_result}')
     print('Score: {}'.format(final_score))
@@ -137,7 +152,9 @@ if __name__ == '__main__':
     if len(sys.argv) < 2:
         print(sys.argv[0] + ' [in file] [out file: optional]')
     elif len(sys.argv) == 2:
-        main(sys.argv[1], None)
+        main(sys.argv[1], None, 1)
+    elif len(sys.argv) == 3:
+        main(sys.argv[1], None, int(sys.argv[2]))
     else:
-        main(sys.argv[1], sys.argv[2])
+        main(sys.argv[1], sys.argv[3], int(sys.argv[2]))
 
