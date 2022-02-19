@@ -57,6 +57,15 @@ def read_file(in_file):
 
     return clients.clients, list(products)
 
+def write_file(out_file, final_result):
+    """
+    Write the submission file
+
+    Args:
+        out_file: output file path
+    """
+    with open(out_file, 'w') as outfile:
+        outfile.write(f'{len(final_result)} {" ".join(final_result)}')
 
 def eval_sol(Clients, pizza):
     puntos = 0
@@ -117,7 +126,7 @@ def main(in_file, out_file):
     print('Score: {}'.format(final_score))
     # Save results into the output if instructed
     if out_file is not None:
-        # write_file(out_file, final_result)
+        write_file(out_file, final_result)
         print('{} is saved. The program completed.'.format(out_file))
     else:
         print('The program completed.')
@@ -125,11 +134,10 @@ def main(in_file, out_file):
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    main('input_data/a_an_example.in.txt', None)
-    # if len(sys.argv) < 2:
-    #     print(sys.argv[0] + ' [in file] [out file: optional]')
-    # elif len(sys.argv) == 2:
-    #     main(sys.argv[1], None)
-    # else:
-    #     main(sys.argv[1], sys.argv[2])
+    if len(sys.argv) < 2:
+        print(sys.argv[0] + ' [in file] [out file: optional]')
+    elif len(sys.argv) == 2:
+        main(sys.argv[1], None)
+    else:
+        main(sys.argv[1], sys.argv[2])
 

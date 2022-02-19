@@ -86,7 +86,7 @@ The total number of books in all libraries does not exceed 10^6
 
 | Input  |  Description |
 |---|---|
-| 6 2 7  | There are 6 boos, 2 libraries, and 7 days for scanning  | 
+| 6 2 7  | There are 6 books, 2 libraries, and 7 days for scanning  | 
 | 1 2 3 6 5 4  | The scores of te books are 1, 2, 3, 6, 5, 4  |
 | 5 2 2  | Library 0 has 5 books, the signup process takes 2 days, and the library can ship 2 books per day  | 
 | 0 1 2 3 4 | The books in library 0 are: book 0, book 1, ... |

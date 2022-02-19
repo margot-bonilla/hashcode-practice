@@ -110,7 +110,7 @@ def main(in_file, out_file):
 
 if __name__ == "__main__":
     # test
-    main('input_data/a_an_example.in.txt', None)
+    main('../../Pizza/input_data/a_an_example.in.txt', None)
 
 
     # Check arguments
