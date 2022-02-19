@@ -125,10 +125,11 @@ def main(in_file, out_file):
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print(sys.argv[0] + ' [in file] [out file: optional]')
-    elif len(sys.argv) == 2:
-        main(sys.argv[1], None)
-    else:
-        main(sys.argv[1], sys.argv[2])
+    main('input_data/a_an_example.in.txt', None)
+    # if len(sys.argv) < 2:
+    #     print(sys.argv[0] + ' [in file] [out file: optional]')
+    # elif len(sys.argv) == 2:
+    #     main(sys.argv[1], None)
+    # else:
+    #     main(sys.argv[1], sys.argv[2])
 
