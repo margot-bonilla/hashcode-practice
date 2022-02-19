@@ -3,23 +3,6 @@ import random as rand
 import copy
 from multiprocessing import Process, Queue
 
-# Press Mayús+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-class Clients:
-    def __init__(self):
-        self.clients = list()
-
-    def append(self, client):
-        self.clients.append(client)
-
-    def __str__(self):
-        return '\n\n'.join([str(client) for client in self.clients])
-
-    def __repr__(self):
-        return '\n\n'.join([str(client) for client in self.clients])
-
 
 class Client:
     def __init__(self, likes, dislikes):
@@ -44,19 +27,20 @@ def read_file(in_file):
         List of Clients
     """
     # Define variables
-    clients = Clients()
+    clients = []
 
     # Read the file into variables
     with open(in_file, 'r') as infile:
         number_of_clients = int(infile.readline())
         products = set()
         for client in range(number_of_clients):
-            likes = [ingredient for ingredient in infile.readline().strip().split(' ')[1:]]
-            dislikes = [ingredient for ingredient in infile.readline().strip().split(' ')[1:]]
+            likes = infile.readline().strip().split(' ')[1:]
+            dislikes = infile.readline().strip().split(' ')[1:]
             products = products.union(likes).union(dislikes)
             clients.append(Client(likes, dislikes))
 
-    return clients.clients, list(products)
+    return clients, list(products)
+
 
 def write_file(out_file, final_result):
     """
@@ -64,17 +48,21 @@ def write_file(out_file, final_result):
 
     Args:
         out_file: output file path
+        final_result: list with the result
     """
     with open(out_file, 'w') as outfile:
         outfile.write(f'{len(final_result)} {" ".join(final_result)}')
 
-def eval_sol(Clients, pizza):
-    puntos = 0
-    for i in Clients:
-        if len(set(i.likes)-set(pizza)) == 0 and len(set(pizza) - set(i.dislikes)) == len(pizza):
-            puntos += 1
 
-    return puntos
+def eval_sol(clients, pizza):
+    print(f'Evaluating {len(clients)} clients for pizza with {len(pizza)} ingredients')
+    score = 0
+    for i in clients:
+        if len(set(i.likes)-set(pizza)) == 0 and len(set(pizza) - set(i.dislikes)) == len(pizza):
+            score += 1
+
+    return score
+
 
 def inicializar_lista(Clients, productos):
     dic = {k: 0 for k in productos}
@@ -86,22 +74,29 @@ def inicializar_lista(Clients, productos):
                 dic[i] -= 1
 
     dic = dict(sorted(dic.items(), reverse=True, key=lambda item: item[1]))
+
+    print(f'List of products initialized')
+    # print(dic)
     return dic
 
 
-def algo(Clients, productos, q, seed):
-    dic = inicializar_lista(Clients, productos)
+def algo(clients, products, q, seed):
+    print(f'{len(products)} number of products')
+    dic = inicializar_lista(clients, products)
 
     best_pizza = []
     best_points = 0
-    for _ in range(10000):
+    for _ in range(1):
         pizza = []
         while len(dic) > 0:
             n = rand.randint(0, min([len(dic)-1, 2]))
             pizza.append([*dic][n])
             del dic[[*dic][n]]
-            points = eval_sol(Clients, pizza)
+            points = eval_sol(clients, pizza)
             if points > best_points:
+                print(f'Found a good pizza :)')
+                # print(best_pizza)
+                print(best_points)
                 best_pizza = copy.deepcopy(pizza)
                 best_points = points
 
@@ -137,7 +132,7 @@ def main(in_file, process_count, out_file):
     sorted_results = sorted(results, key=lambda tup: tup[1], reverse=True)
     final_result, final_score = sorted_results[0]
     # Print Score
-    print(f'Result: {final_result}')
+    # print(f'Result: {final_result}')
     print('Score: {}'.format(final_score))
     # Save results into the output if instructed
     if out_file is not None:
