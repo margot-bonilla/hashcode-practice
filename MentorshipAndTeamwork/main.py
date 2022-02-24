@@ -27,6 +27,28 @@ class Skill:
         self.level = level
 
 
+class SuperDict(dict):
+    def __init__(self, *arg, **kw):
+        super(SuperDict, self).__init__(*arg, **kw)
+
+    @staticmethod
+    def build_key(skill_name: str, level: int):
+        return f'{skill_name}{level}'
+
+    def ensure(self, key: str):
+        if key not in self:
+            self[key] = {'seniors': dict(), 'interns': dict()}
+
+    def upgrade_level(self, developer: Developer, skill_name: str):
+        current_level = developer.skills[skill_name].level
+        next_key = self.build_key(skill_name, current_level + 1)
+        next_next_key = self.build_key(skill_name, current_level + 2)
+        del self[next_key]['interns'][developer.name]
+        self.ensure(next_next_key)
+        self[next_key]['seniors'][developer.name] = developer
+        self[next_next_key]['interns'][developer.name] = developer
+
+
 def read_file(in_file):
     """
     Read Input File
@@ -44,7 +66,7 @@ def read_file(in_file):
 
     # Read the file into variables
     with open(in_file, 'r') as infile:
-        super_dict = dict()
+        super_dict = SuperDict()
         n_developers, n_projects = map(int, infile.readline().split(' '))
         for _ in range(n_developers):
             name, n_skills = infile.readline().split(' ')
@@ -59,18 +81,10 @@ def read_file(in_file):
             for skill in developer.skills.values():
                 for i in range(skill.level + 1):
                     key = skill.name + str(i)
-                    if key not in super_dict:
-                        super_dict[key] = {
-                            'interns': dict(),
-                            'seniors': dict(),
-                        }
+                    super_dict.ensure(key)
                     super_dict[key]['seniors'][developer.name] = developer
                 key = skill.name + str(skill.level + 1)
-                if key not in super_dict:
-                    super_dict[key] = {
-                        'interns': dict(),
-                        'seniors': dict(),
-                    }
+                super_dict.ensure(key)
                 super_dict[key]['interns'][developer.name] = developer
 
         for _ in range(n_projects):
@@ -88,7 +102,7 @@ def read_file(in_file):
     return developers, projects, skills_lookup, super_dict
 
 
-def dummy_solution(projects, developers, super_dict):
+def dummy_solution(projects, developers, super_dict: SuperDict):
     """
     solution =
     {
@@ -111,16 +125,8 @@ def dummy_solution(projects, developers, super_dict):
                     solution[project.name].add(dev.name)
                     # increment skill level
                     if role.level == dev.skills[role.name].level:
+                        super_dict.upgrade_level(dev, role.name)
                         dev.skills[role.name].level += 1
-                        if super_next_name not in super_dict:
-                            super_dict[super_next_name] = {'seniors': dict(), 'interns': dict()}
-
-                        super_dict[super_next_name]['seniors'][dev.name] = dev
-                        del super_dict[super_next_name]['interns'][dev.name]
-
-                        if super_next_next_name not in super_dict:
-                            super_dict[super_next_next_name] = {'seniors': dict(), 'interns': dict()}
-                        super_dict[super_next_next_name]['interns'][dev.name] = dev
 
     return solution
 
