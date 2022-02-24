@@ -33,7 +33,7 @@ class SuperDict(dict):
 
     @staticmethod
     def build_key(skill_name: str, level: int):
-        return f'{skill_name}{level}'
+        return f'{skill_name}#{level}'
 
     def ensure(self, key: str):
         if key not in self:
@@ -42,10 +42,11 @@ class SuperDict(dict):
     def upgrade_level(self, developer: Developer, skill_name: str):
         current_level = developer.skills[skill_name].level
         next_key = self.build_key(skill_name, current_level + 1)
-        next_next_key = self.build_key(skill_name, current_level + 2)
-        del self[next_key]['interns'][developer.name]
-        self.ensure(next_next_key)
+        if developer.name in self[next_key]['interns']:
+            del self[next_key]['interns'][developer.name]
         self[next_key]['seniors'][developer.name] = developer
+        next_next_key = self.build_key(skill_name, current_level + 2)
+        self.ensure(next_next_key)
         self[next_next_key]['interns'][developer.name] = developer
 
 
@@ -80,10 +81,10 @@ def read_file(in_file):
             developers.append(developer)
             for skill in developer.skills.values():
                 for i in range(skill.level + 1):
-                    key = skill.name + str(i)
+                    key = SuperDict.build_key(skill.name, i)
                     super_dict.ensure(key)
                     super_dict[key]['seniors'][developer.name] = developer
-                key = skill.name + str(skill.level + 1)
+                key = SuperDict.build_key(skill.name, skill.level + 1)
                 super_dict.ensure(key)
                 super_dict[key]['interns'][developer.name] = developer
 
@@ -115,9 +116,8 @@ def dummy_solution(projects, developers, super_dict: SuperDict):
         project = sorted_projects.pop()
         solution[project.name] = set()
         for role in project.roles:
-            super_name = f'{role.name}{role.level}'
-            super_next_name = f'{role.name}{role.level + 1}'
-            super_next_next_name = f'{role.name}{role.level + 2}'
+            super_name = SuperDict.build_key(role.name, role.level)
+            super_dict.ensure(super_name)
             seniors = list(super_dict[super_name]['seniors'].values())
 
             for dev in seniors:
