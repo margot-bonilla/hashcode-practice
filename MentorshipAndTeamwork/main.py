@@ -1,9 +1,18 @@
 import sys
 
 
+class Project:
+    def __init__(self, name, score, best_before):
+        self.id = id(self)
+        self.name = name
+        self.score = score
+        self.best_before = best_before
+        self.roles = list()
+
+
 def read_file(in_file):
     """
-    Read Intput File
+    Read Input File
 
     Args:
         in_file: input file path
