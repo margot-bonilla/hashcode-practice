@@ -1,4 +1,4 @@
-
+import random as rnd
 
 def create_list(proyectos, alpha1, alpha2):
     list = []
@@ -7,8 +7,13 @@ def create_list(proyectos, alpha1, alpha2):
 
     return list
 
+def select_as_random(list):
+    return list.pop(rnd.randint(0, 2))
+
 def algo(proyectos, alpha1, alpha2):
 
-    create_list(proyectos, alpha1, alpha2)
+    list = create_list(proyectos, alpha1, alpha2)
+    proyect = select_as_random(list)
+
     
 
