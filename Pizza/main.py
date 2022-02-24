@@ -82,11 +82,12 @@ def inicializar_lista(Clients, productos):
 
 def algo(clients, products, q, seed):
     print(f'{len(products)} number of products')
-    dic = inicializar_lista(clients, products)
+    dict = inicializar_lista(clients, products)
 
     best_pizza = []
     best_points = 0
-    for _ in range(1):
+    for _ in range(100):
+        dic = copy.deepcopy(dict)
         pizza = []
         while len(dic) > 0:
             n = rand.randint(0, min([len(dic)-1, 2]))
