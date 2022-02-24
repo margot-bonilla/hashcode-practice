@@ -41,6 +41,7 @@ def read_file(in_file):
 
     # Read the file into variables
     with open(in_file, 'r') as infile:
+        super_dict = dict()
         n_developers, n_projects = map(int, infile.readline().split(' '))
         for _ in range(n_developers):
             name, n_skills = infile.readline().split(' ')
@@ -52,6 +53,22 @@ def read_file(in_file):
                     skills_lookup[skill_lookup_name] = Skill(skill_name, int(level))
                 developer.skills.append(skills_lookup[skill_lookup_name])
             developers.append(developer)
+            for skill in developer.skills:
+                for i in range(skill.level + 1):
+                    key = skill.name + str(i)
+                    if key not in super_dict:
+                        super_dict[key] = {
+                            'interns': dict(),
+                            'seniors': dict(),
+                        }
+                    super_dict[key]['seniors'][developer.name] = developer
+                key = skill.name + str(skill.level + 1)
+                if key not in super_dict:
+                    super_dict[key] = {
+                        'interns': dict(),
+                        'seniors': dict(),
+                    }
+                super_dict[key]['interns'][developer.name] = developer
 
         for _ in range(n_projects):
             name, days_to_complete, score, best_before, n_roles = infile.readline().split(' ')
@@ -64,7 +81,7 @@ def read_file(in_file):
                 project.roles.append(skills_lookup[skill_lookup_name])
             projects.append(project)
 
-    return developers, projects, skills_lookup
+    return developers, projects, skills_lookup, super_dict
 
 
 def process(result_params):
