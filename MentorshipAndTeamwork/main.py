@@ -125,7 +125,7 @@ def dummy_solution(projects, developers, super_dict):
     return solution
 
 
-def process(result_params):
+def process(developers, projects, super_dict):
     """
     The main program reads the input file, processes the calculation
     and writes the output file
@@ -141,6 +141,7 @@ def process(result_params):
     final_result = []
 
     ### Logic here
+    final_result = dummy_solution(projects, developers, super_dict)
 
     return final_score, final_result  # return process result
 
@@ -153,6 +154,11 @@ def write_file(out_file, final_result):
         out_file: output file path
     """
     with open(out_file, 'w') as outfile:
+        outfile.write(f'{len(final_result)}\n')
+        for p, devs in final_result.items():
+            outfile.write(f'{p}\n')
+            outfile.write(f'{" ".join(list(devs))}\n')
+
         # Save result into the output file
         pass
 
@@ -168,11 +174,14 @@ def main(in_file, out_file):
     """
 
     # Read File
-    result_params = read_file(in_file)
+    developers, projects, skills_lookup, super_dict = read_file(in_file)
+
     # Process Algorithm
-    final_score, final_result = process(result_params)
+    final_score, final_result = process(developers, projects, super_dict)
+
     # Print Score
     print('Score: {}'.format(final_score))
+
     # Save results into the output if instructed
     if out_file is not None:
         write_file(out_file, final_result)
@@ -182,16 +191,12 @@ def main(in_file, out_file):
 
 
 if __name__ == "__main__":
-    developers, projects, skills_lookup, super_dict = read_file('input_data/a_an_example.in.txt')
-    solution = dummy_solution(projects, developers, super_dict)
-    print(solution)
-
-    # # Check arguments
-    # if len(sys.argv) < 2:
-    #     print(sys.argv[0] + ' [in file] [out file: optional]')
-    # elif len(sys.argv) == 2:
-    #     main(sys.argv[1], None)
-    # else:
-    #     main(sys.argv[1], sys.argv[2])
+    # Check arguments
+    if len(sys.argv) < 2:
+        print(sys.argv[0] + ' [in file] [out file: optional]')
+    elif len(sys.argv) == 2:
+        main(sys.argv[1], None)
+    else:
+        main(sys.argv[1], sys.argv[2])
 
 ### End of Program ###
