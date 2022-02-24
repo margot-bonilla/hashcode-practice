@@ -10,10 +10,12 @@ def create_list(proyectos, alpha1, alpha2):
 def select_as_random(list):
     return list.pop(rnd.randint(0, 2))
 
+def select_
+
 def algo(proyectos, alpha1, alpha2):
 
     list = create_list(proyectos, alpha1, alpha2)
     proyect = select_as_random(list)
 
-    
+
 
