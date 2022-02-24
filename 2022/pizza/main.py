@@ -1,30 +1,38 @@
 import sys
 
 
-class Clients:
-    def __init__(self):
-        self.clients = list()
-
-    def append(self, client):
-        self.clients.append(client)
-
-    def __str__(self):
-        return '\n\n'.join([str(client) for client in self.clients])
-
-    def __repr__(self):
-        return '\n\n'.join([str(client) for client in self.clients])
-
-
 class Client:
-    def __init__(self, likes, dislikes):
-        self.likes = likes
-        self.dislikes = dislikes
+    def __init__(self):
+        self.id = id(self)
+        self.likes = set()
+        self.dislikes = set()
 
-    def __str__(self):
-        return f'likes: {",".join(self.likes)}\ndislikes: {",".join(self.dislikes)}'
+    def is_good_pizza(self, pizza):
+        return len(self.likes - pizza) == 0 and len(pizza - self.dislikes) == len(pizza)
 
-    def __repr__(self):
-        return f'likes: {",".join(self.likes)}\ndislikes: {",".join(self.dislikes)}'
+
+class Ingredient:
+    def __init__(self, name):
+        self.id = id(self)
+        self.name = name
+        self.client_likes = set()
+        self.client_dislikes = set()
+
+
+def fill_ingredients(client, ingredients, ingredients_to_check, ingredients_lookup, liked):
+    total_ingredients = set()
+    for liked_ingredient in ingredients_to_check:
+        if liked_ingredient not in ingredients_lookup:
+            ingredients_lookup[liked_ingredient] = Ingredient(liked_ingredient)
+            ingredients.append(ingredients_lookup[liked_ingredient])
+        if liked:
+            ingredients_lookup[liked_ingredient].client_likes.add(client)
+        else:
+            ingredients_lookup[liked_ingredient].client_dislikes.add(client)
+
+        total_ingredients.add(ingredients_lookup[liked_ingredient].id)
+
+    return total_ingredients
 
 
 def read_file(in_file):
@@ -38,17 +46,19 @@ def read_file(in_file):
         List of Clients
     """
     # Define variables
-    clients = Clients()
+    clients = []
+    ingredients = []
+    ingredients_lookup = dict()
 
     # Read the file into variables    
     with open(in_file, 'r') as infile:
         number_of_clients = int(infile.readline())
         for client in range(number_of_clients):
-            likes = [ingredient for ingredient in infile.readline().strip().split(' ')[1:]]
-            dislikes = [ingredient for ingredient in infile.readline().strip().split(' ')[1:]]
-            clients.append(Client(likes, dislikes))
+            client = Client()
+            client.likes = fill_ingredients(client, ingredients, infile.readline().strip().split(' ')[1:], ingredients_lookup, True)
+            client.dislikes = fill_ingredients(client, ingredients, infile.readline().strip().split(' ')[1:], ingredients_lookup, False)
+            clients.append(client)
 
-    print(clients)
     return clients
 
 
@@ -110,7 +120,7 @@ def main(in_file, out_file):
 
 if __name__ == "__main__":
     # test
-    main('../../Pizza/input_data/a_an_example.in.txt', None)
+    main('input_data/a_an_example.in.txt', None)
 
 
     # Check arguments
