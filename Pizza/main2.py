@@ -1,5 +1,7 @@
 import sys
 from multiprocessing import Process, Queue
+from collections import defaultdict
+import copy
 
 
 class Client:
@@ -51,25 +53,49 @@ def write_file(out_file, final_result):
         outfile.write(f'{len(final_result)} {" ".join(final_result)}')
 
 
+def get_picky_clients(clients):
+    picky_clients = defaultdict(int)
+    picky_products = defaultdict(int)
+    for client in clients:
+        picky_clients['_'.join(sorted(client.dislikes))] += 1
+        for product in client.dislikes:
+            picky_products[product] += 1
+
+    # return dict(sorted(picky_clients.items(), key=lambda item: item[1])[::-1])
+    return dict(sorted(picky_products.items(), key=lambda item: item[1]))
+
+
 def algorithm(clients, products_total, products_liked, products_disliked, q, seed):
-    best_pizza = set(products_liked)
-    best_points = get_score(clients, best_pizza)
-    for picky in products_disliked:
-        best_pizza.discard(picky)
-        new_score = get_score(clients, best_pizza)
-        if new_score < best_points:
-            best_pizza.add(picky)
-        best_points = max(best_points, new_score)
+    best_pizza = set()
+    best_points, happy_clients, unhappy_clients = get_score(clients, best_pizza)
+
+    # picky_clients = get_picky_clients(clients)
+
+    pizza = []
+    for unhappy_client in unhappy_clients:
+        pizza = pizza.union(set(unhappy_client.likes))
+        pizza.discard(set(unhappy_client.dislikes))
+
+        new_score, happy_clients, unhappy_clients = get_score(clients, pizza)
+        if new_score > best_points:
+            best_points = new_score
+            best_pizza = copy.deepcopy(pizza)
 
     return list(best_pizza), best_points
 
 
 def get_score(clients, pizza):
     score = 0
+    happy_clients = []
+    unhappy_clients = []
     for client in clients:
         if len(set(client.likes) - set(pizza)) == 0 and len(set(pizza) - set(client.dislikes)) == len(pizza):
             score += 1
-    return score
+            happy_clients.append(client)
+        else:
+            unhappy_clients.append(client)
+
+    return score, happy_clients, unhappy_clients
 
 
 def main(in_file, process_count, out_file):
@@ -84,7 +110,9 @@ def main(in_file, process_count, out_file):
 
     # Read File
     clients, products_total, products_liked, products_disliked = read_file(in_file)
-    print(f"We have a total of {len(products_liked)}")
+    print(f"We have a total of {len(products_total)} products")
+    print(f"We have a total of {len(products_liked)} products liked")
+    print(f"We have a total of {len(products_disliked)} products disliked")
 
     # Process Algorithm
     final_result, final_score = algorithm(clients, products_total, products_liked, products_disliked, 0, 0)
@@ -103,7 +131,7 @@ def main(in_file, process_count, out_file):
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    # main('input_data/a_an_example.in.txt', 1, 'output_data/a_an_example.out.txt')
+    # main('input_data/e_elaborate.in.txt', 1, 'output_data/e_elaborate.out.txt')
     if len(sys.argv) < 2:
         print(sys.argv[0] + ' [in file] [out file: optional]')
     elif len(sys.argv) == 2:
