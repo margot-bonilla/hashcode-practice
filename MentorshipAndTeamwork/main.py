@@ -10,6 +10,20 @@ class Project:
         self.roles = list()
 
 
+class Developer:
+    def __init__(self, name):
+        self.id = id(self)
+        self.name = name
+        self.skills = list()
+
+
+class Skill:
+    def __init__(self, name, level):
+        self.id = id(self)
+        self.name = name
+        self.level = level
+
+
 def read_file(in_file):
     """
     Read Input File
@@ -21,14 +35,29 @@ def read_file(in_file):
         result_params: Resulted Parameters
     """
     # Define variables
-    result_params = []
+    developers = []
+    projects = []
 
     # Read the file into variables
     with open(in_file, 'r') as infile:
-        # Process lines and save data into variables
-        pass
+        n_developers, n_projects = map(int, infile.readline().split(' '))
+        for _ in range(n_developers):
+            name, n_skills = infile.readline().split(' ')
+            developer = Developer(name)
+            for skill in range(int(n_skills)):
+                skill, level = infile.readline().split(' ')
+                developer.skills.append(Skill(skill, int(level)))
+            developers.append(developer)
 
-    return result_params  # return essential variables
+        for project in range(n_projects):
+            name, days_to_complete, score, best_before, n_roles = infile.readline().split(' ')
+            project = Project(name, int(score), int(best_before))
+            for role in range(int(n_roles)):
+                skill, level = infile.readline().split(' ')
+                project.roles.append(Skill(skill, int(level)))
+            projects.append(project)
+
+    return developers, projects
 
 
 def process(result_params):
@@ -88,12 +117,13 @@ def main(in_file, out_file):
 
 
 if __name__ == "__main__":
-    # Check arguments
-    if len(sys.argv) < 2:
-        print(sys.argv[0] + ' [in file] [out file: optional]')
-    elif len(sys.argv) == 2:
-        main(sys.argv[1], None)
-    else:
-        main(sys.argv[1], sys.argv[2])
+    read_file('input_data/a_an_example.in.txt')
+    # # Check arguments
+    # if len(sys.argv) < 2:
+    #     print(sys.argv[0] + ' [in file] [out file: optional]')
+    # elif len(sys.argv) == 2:
+    #     main(sys.argv[1], None)
+    # else:
+    #     main(sys.argv[1], sys.argv[2])
 
 ### End of Program ###
