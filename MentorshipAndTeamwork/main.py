@@ -37,6 +37,7 @@ def read_file(in_file):
     # Define variables
     developers = []
     projects = []
+    skills_lookup = dict()
 
     # Read the file into variables
     with open(in_file, 'r') as infile:
@@ -44,20 +45,26 @@ def read_file(in_file):
         for _ in range(n_developers):
             name, n_skills = infile.readline().split(' ')
             developer = Developer(name)
-            for skill in range(int(n_skills)):
-                skill, level = infile.readline().split(' ')
-                developer.skills.append(Skill(skill, int(level)))
+            for _ in range(int(n_skills)):
+                skill_name, level = infile.readline().split(' ')
+                skill_lookup_name = f'{skill_name}:{int(level)}'
+                if skill_lookup_name not in skills_lookup:
+                    skills_lookup[skill_lookup_name] = Skill(skill_name, int(level))
+                developer.skills.append(skills_lookup[skill_lookup_name])
             developers.append(developer)
 
-        for project in range(n_projects):
+        for _ in range(n_projects):
             name, days_to_complete, score, best_before, n_roles = infile.readline().split(' ')
             project = Project(name, int(score), int(best_before))
-            for role in range(int(n_roles)):
+            for _ in range(int(n_roles)):
                 skill, level = infile.readline().split(' ')
-                project.roles.append(Skill(skill, int(level)))
+                skill_lookup_name = f'{skill_name}:{int(level)}'
+                if skill_lookup_name not in skills_lookup:
+                    skills_lookup[skill_lookup_name] = Skill(skill_name, int(level))
+                project.roles.append(skills_lookup[skill_lookup_name])
             projects.append(project)
 
-    return developers, projects
+    return developers, projects, skills_lookup
 
 
 def process(result_params):
