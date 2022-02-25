@@ -10,19 +10,6 @@ def create_list(proyectos, alpha1, alpha2):
 def select_as_random(list):
     return list.pop(rnd.randint(0, 2))
 
-def select_developer(developers, proyect, dict):
-    
-    # No puedo /  Becario  / Puede
-    #    -1          0         1
-
-    #for skill in developers:
-    #    for code in proyect.roles:
-    for i in developers:
-
-    pass
-
-
-
 
 def algo(proyectos, alpha1, alpha2):
 

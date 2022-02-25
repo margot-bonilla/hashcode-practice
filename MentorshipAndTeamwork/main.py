@@ -1,6 +1,8 @@
+import copy
 import sys
 alpha1 = 1
 alpha2 = 1
+import random as rnd
 
 class Project:
     def __init__(self, name, duration, score, best_before, roles):
@@ -11,6 +13,8 @@ class Project:
         self.best_before = best_before
         self.roles = roles
         self.value = score/(alpha1 * len(self.roles) + alpha2 * duration)
+        self.developers = []
+        self.time_end = -1
 
 
 class Developer:
@@ -18,6 +22,7 @@ class Developer:
         self.id = id(self)
         self.name = name
         self.skills = dict()
+        self.ocupation_time = 0
 
 
 class Skill:
@@ -25,6 +30,7 @@ class Skill:
         self.id = id(self)
         self.name = name
         self.level = level
+
 
 
 class SuperDict(dict):
@@ -101,6 +107,66 @@ def read_file(in_file):
             projects.append(Project(name, int(duration), int(score), int(best_before), roles))
 
     return developers, projects, skills_lookup, super_dict
+
+def select_as_random(proyect_list):
+    return proyect_list.pop(rnd.randint(0, min([2, len(proyect_list)-1])))
+
+def select_developer(proyect: Project, developers: Developer):
+    dev_list_roles = []
+    for i in proyect.roles:
+        dev_list = []
+        for j in developers:
+            if i.name not in j.skills.keys():
+                j.skills[i.name] = Skill(i.name, 0)
+            if j.skills[i.name].level >= i.level:
+                dev_list.append(j)
+
+        dev_list_roles.append(dev_list)
+
+    for dev in dev_list_roles:
+        lista = [i for i in dev if i not in proyect.developers]
+        if len(lista) > 0:
+            developer_selected = lista[rnd.randint(0, len(lista)-1)]
+        else:
+            break
+
+        proyect.developers.append(developer_selected)
+
+    if len(proyect.developers)==len(proyect.roles):
+        proyect.time_end = max([i.ocupation_time for i in proyect.developers]) + proyect.duration
+        for i in proyect.developers:
+            i.ocupation_time += proyect.duration
+
+        for i, role in enumerate(proyect.roles):
+            j = proyect.developers[i]
+            if j.skills[role.name].level == role.level:
+                j.skills[role.name].level += 1
+
+
+if __name__ == "__main__":
+    in_file = "input_data/e_exceptional_skills.in.txt"
+    developers_master, projects_master, skills_lookup, super_dict = read_file(in_file)
+    sorted_projects_master = sorted(projects_master, key=lambda p: p.value, reverse=True)
+    best_score = -1
+    best_sol = None
+    for _ in range(100):
+        projects = copy.deepcopy(projects_master)
+        developers = copy.deepcopy(developers_master)
+        sorted_projects = copy.deepcopy(sorted_projects_master)
+        list_project = []
+        while len(sorted_projects) > 0:
+            proyect = select_as_random(sorted_projects)
+            select_developer(proyect, developers)
+            list_project.append(proyect)
+        punt = 0
+        for p in list_project:
+            if p.time_end == -1:
+                continue
+            punt += p.score if p.time_end < p.best_before else max([p.score - (p.time_end - p.best_before), 0])
+        if punt > best_score:
+            best_score = punt
+            best_sol = copy.deepcopy(projects)
+        print(punt)
 
 
 def dummy_solution(projects, developers, super_dict: SuperDict):
@@ -196,13 +262,13 @@ def main(in_file, out_file):
         print('The program completed.')
 
 
-if __name__ == "__main__":
+#if __name__ == "__main__":
     # Check arguments
-    if len(sys.argv) < 2:
-        print(sys.argv[0] + ' [in file] [out file: optional]')
-    elif len(sys.argv) == 2:
-        main(sys.argv[1], None)
-    else:
-        main(sys.argv[1], sys.argv[2])
+#    if len(sys.argv) < 2:
+#        print(sys.argv[0] + ' [in file] [out file: optional]')
+#    elif len(sys.argv) == 2:
+#        main(sys.argv[1], None)
+#    else:
+#        main(sys.argv[1], sys.argv[2])
 
 ### End of Program ###
