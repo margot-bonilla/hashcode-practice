@@ -1,8 +1,11 @@
 import copy
 import sys
+import random as rnd
+from typing import List
+
 alpha1 = 1
 alpha2 = 1
-import random as rnd
+
 
 class Project:
     def __init__(self, name, duration, score, best_before, roles):
@@ -30,7 +33,6 @@ class Skill:
         self.id = id(self)
         self.name = name
         self.level = level
-
 
 
 class SuperDict(dict):
@@ -108,10 +110,12 @@ def read_file(in_file):
 
     return developers, projects, skills_lookup, super_dict
 
+
 def select_as_random(proyect_list):
     return proyect_list.pop(rnd.randint(0, min([2, len(proyect_list)-1])))
 
-def select_developer(proyect: Project, developers: Developer):
+
+def select_developer(proyect: Project, developers: List[Developer]):
     dev_list_roles = []
     for i in proyect.roles:
         dev_list = []
@@ -143,20 +147,32 @@ def select_developer(proyect: Project, developers: Developer):
                 j.skills[role.name].level += 1
 
 
-if __name__ == "__main__":
-    in_file = "input_data/e_exceptional_skills.in.txt"
+def copy_projects(projects: List[Project]) -> List[Project]:
+    projects_c = []
+    for p in projects:
+        pc = copy.deepcopy(p)
+        for d in p.developers:
+            pc.developers.append(copy.deepcopy(d))
+        projects_c.append(pc)
+
+    return projects_c
+
+
+def main_jf(in_file, out_file):
     developers_master, projects_master, skills_lookup, super_dict = read_file(in_file)
     sorted_projects_master = sorted(projects_master, key=lambda p: p.value, reverse=True)
     best_score = -1
     best_sol = None
     for _ in range(100):
-        projects = copy.deepcopy(projects_master)
         developers = copy.deepcopy(developers_master)
         sorted_projects = copy.deepcopy(sorted_projects_master)
         list_project = []
         while len(sorted_projects) > 0:
             proyect = select_as_random(sorted_projects)
             select_developer(proyect, developers)
+            if len(proyect.developers) < len(proyect.roles):
+                # sorted_projects.append(proyect)
+                continue
             list_project.append(proyect)
         punt = 0
         for p in list_project:
@@ -165,8 +181,11 @@ if __name__ == "__main__":
             punt += p.score if p.time_end < p.best_before else max([p.score - (p.time_end - p.best_before), 0])
         if punt > best_score:
             best_score = punt
-            best_sol = copy.deepcopy(projects)
-        print(punt)
+            best_sol = copy.deepcopy(list_project)
+        # print(punt)
+
+    print(f'Best punctuation: {best_score}')
+    write_file(out_file, best_sol)
 
 
 def dummy_solution(projects, developers, super_dict: SuperDict):
@@ -218,7 +237,7 @@ def process(developers, projects, super_dict):
     return final_score, final_result  # return process result
 
 
-def write_file(out_file, final_result):
+def write_file(out_file, final_result: List[Project]):
     """
     Write the submission file
 
@@ -227,12 +246,10 @@ def write_file(out_file, final_result):
     """
     with open(out_file, 'w') as outfile:
         outfile.write(f'{len(final_result)}\n')
-        for p, devs in final_result.items():
-            outfile.write(f'{p}\n')
-            outfile.write(f'{" ".join(list(devs))}\n')
-
-        # Save result into the output file
-        pass
+        for p in final_result:
+            outfile.write(f'{p.name}\n')
+            dev_names = [d.name for d in p.developers]
+            outfile.write(f'{" ".join(dev_names)}\n')
 
 
 def main(in_file, out_file):
@@ -262,13 +279,14 @@ def main(in_file, out_file):
         print('The program completed.')
 
 
-#if __name__ == "__main__":
+if __name__ == "__main__":
     # Check arguments
-#    if len(sys.argv) < 2:
-#        print(sys.argv[0] + ' [in file] [out file: optional]')
-#    elif len(sys.argv) == 2:
-#        main(sys.argv[1], None)
-#    else:
-#        main(sys.argv[1], sys.argv[2])
+    # main_jf('input_data/b_better_start_small.in.txt', 'output_data/b_better_start_small.2.out.txt')
+    if len(sys.argv) < 2:
+        print(sys.argv[0] + ' [in file] [out file: optional]')
+    elif len(sys.argv) == 2:
+        main_jf(sys.argv[1], None)
+    else:
+        main_jf(sys.argv[1], sys.argv[2])
 
 ### End of Program ###
