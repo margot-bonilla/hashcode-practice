@@ -163,7 +163,7 @@ def main_jf(in_file, out_file):
     sorted_projects_master = sorted(projects_master, key=lambda p: p.value, reverse=True)
     best_score = -1
     best_sol = None
-    for _ in range(100):
+    for _ in range(1):
         developers = copy.deepcopy(developers_master)
         sorted_projects = copy.deepcopy(sorted_projects_master)
         list_project = []
@@ -281,12 +281,13 @@ def main(in_file, out_file):
 
 if __name__ == "__main__":
     # Check arguments
-    # main_jf('input_data/b_better_start_small.in.txt', 'output_data/b_better_start_small.2.out.txt')
+    main_jf('input_data/c_collaboration.in.txt', 'output_data/c_collaboration.out.txt')
+    """
     if len(sys.argv) < 2:
         print(sys.argv[0] + ' [in file] [out file: optional]')
     elif len(sys.argv) == 2:
         main_jf(sys.argv[1], None)
     else:
         main_jf(sys.argv[1], sys.argv[2])
-
+"""
 ### End of Program ###
